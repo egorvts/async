@@ -9,14 +9,16 @@ async function run() {
         const orgOgrns = await sendRequest(API.organizationList);
         const ogrns = orgOgrns.join(",");
 
-        const requisites = await sendRequest(`${API.orgReqs}?ogrn=${ogrns}`);
-        const orgsMap = reqsToMap(requisites);
+        // const requisites = await sendRequest(`${API.orgReqs}?ogrn=${ogrns}`);
 
         // analytics and buh can be requested in parallel
-        const [analytics, buh] = await Promise.all([
+        const [orgReqs, analytics, buh] = await Promise.all([
+            sendRequest(`${API.orgReqs}?ogrn=${ogrns}`),
             sendRequest(`${API.analytics}?ogrn=${ogrns}`),
             sendRequest(`${API.buhForms}?ogrn=${ogrns}`),
         ]);
+
+        const orgsMap = reqsToMap(orgReqs);
 
         addInOrgsMap(orgsMap, analytics, "analytics");
         addInOrgsMap(orgsMap, buh, "buhForms");
